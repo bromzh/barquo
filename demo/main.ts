@@ -1,5 +1,4 @@
-import { StreamScanner } from 'barquo/stream';
-import { QrReader } from 'barquo/formats';
+import { StreamScanner, QrReader } from 'barquo';
 
 function main() {
     let canvas = document.querySelector('canvas');

@@ -1,4 +1,4 @@
-import { BitMatrix } from 'barquo/core';
+import { BitMatrix } from '../../../core';
 import { ErrorCorrectionLevel, Version, getVersionForNumber, numBitsDiffering } from '../version';
 import { ReedSolomonDecoder } from './reedsolomon';
 import { decodeQRdata } from './qrdecoder';

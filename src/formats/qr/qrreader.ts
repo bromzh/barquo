@@ -1,4 +1,4 @@
-import { Reader, Result, Binarizer, BarcodeType, byteArrayToString } from 'barquo/core';
+import { Reader, Result, Binarizer, BarcodeType, byteArrayToString } from '../../core';
 import { locate } from './locate';
 import { extract } from './extract';
 import { decode } from './decoder';

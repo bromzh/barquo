@@ -1,4 +1,4 @@
-import { BitStream } from 'barquo/core';
+import { BitStream } from '../../../core';
 
 function toAlphaNumericByte(value: number): number {
     let ALPHANUMERIC_CHARS: string[] = [

@@ -1,4 +1,4 @@
-import { BitMatrix } from 'barquo/core';
+import { BitMatrix } from '../../core';
 import { Point } from './qrlocation';
 
 interface EstimatedPoint extends Point {

@@ -1,4 +1,4 @@
-import { Reader, Result } from 'barquo/core';
+import { Reader, Result } from '../core';
 import { WebCam } from './webcam';
 export interface ScannerOptions {
     width: number;

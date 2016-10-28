@@ -9,11 +9,11 @@
 // import { findAlignment } from './alignment-finder';
 // import { getVersionForNumber } from './version';
 
-import { BitMatrix } from 'barquo/core';
+import { BitMatrix } from '../..//core';
 import { Point, QRLocation } from './qrlocation';
 import { PerspectiveTransform, transformPoints, quadrilateralToQuadrilateral } from './transform';
 import { findAlignment } from './alignment';
-import { getVersionForNumber } from 'barquo/formats';
+import { getVersionForNumber } from './version';
 
 function checkAndNudgePoints(width: number, height: number, points: number[]): number[] {
     // Check and nudge points from start until we see some that are OK:

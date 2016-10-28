@@ -1,2 +1,2 @@
-import { BitMatrix } from 'barquo/core';
+import { BitMatrix } from '../../../core';
 export declare function decode(matrix: BitMatrix): number[];

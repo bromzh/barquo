@@ -1,4 +1,4 @@
-import { Reader, Result, BitArray } from 'barquo/core';
+import { Reader, Result, BitArray } from '../../core';
 
 export class Code128Reader implements Reader {
     decode(image: ImageData): Result {
