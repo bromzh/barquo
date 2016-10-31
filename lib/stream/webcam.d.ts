@@ -3,7 +3,7 @@ export declare class WebCam {
     readonly isRunning: boolean;
     private isStreaming;
     constructor(video: HTMLVideoElement);
-    getStream(): PromiseLike<MediaStream>;
-    start(): void;
+    getStream(videoOptions?: boolean | MediaTrackConstraints): PromiseLike<MediaStream>;
+    start(videoOptions?: boolean | MediaTrackConstraints): void;
     stop(): void;
 }

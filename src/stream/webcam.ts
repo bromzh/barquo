@@ -7,12 +7,12 @@ export class WebCam {
 
     constructor(public video: HTMLVideoElement) {}
 
-    getStream(): PromiseLike<MediaStream> {
-        return navigator.mediaDevices.getUserMedia({ video: true });
+    getStream(videoOptions: boolean | MediaTrackConstraints = true): PromiseLike<MediaStream> {
+        return navigator.mediaDevices.getUserMedia({ video: videoOptions });
     }
 
-    start(): void {
-        this.getStream()
+    start(videoOptions: boolean | MediaTrackConstraints = true): void {
+        this.getStream(videoOptions)
             .then(stream => {
                 this.isStreaming = true;
                 this.video.srcObject = stream;

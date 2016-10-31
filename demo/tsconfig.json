@@ -11,9 +11,6 @@
     "paths": {
       "barquo": [
         "../lib"
-      ],
-      "barquo/*": [
-        "../lib/*"
       ]
     },
     "types": [

@@ -33,18 +33,18 @@ export class StreamScanner {
         return this.reader.decode(img);
     }
 
-    scan(): Result {
+    scan(videoOptions: boolean | MediaTrackConstraints = true): Result {
         if (!this.webcam.isRunning) {
-            this.webcam.start();
+            this.webcam.start(videoOptions);
         }
         let img = this.takeShot();
         return this.decode(img);
     }
 
-    scanStream(frequency: number = 250): Promise<Result> {
+    scanStream(frequency: number = 250, videoOptions: boolean | MediaTrackConstraints = true): Promise<Result> {
         return new Promise((resolve, reject) => {
             let intervalHandler = setInterval(() => {
-                let result = this.scan();
+                let result = this.scan(videoOptions);
                 if (result !== null) {
                     this.stopScanning(); // TODO make as callback
                     clearInterval(intervalHandler);
