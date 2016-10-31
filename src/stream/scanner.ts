@@ -11,6 +11,8 @@ export class StreamScanner {
     webcam: WebCam;
     ctx: CanvasRenderingContext2D;
 
+    intervalHandler: number;
+
     constructor(public canvas: HTMLCanvasElement, video: HTMLVideoElement, public reader: Reader,
         { width, height }: ScannerOptions = { width: 640, height: 480 }) {
         this.ctx = this.canvas.getContext('2d');
@@ -43,11 +45,10 @@ export class StreamScanner {
 
     scanStream(frequency: number = 250, videoOptions: boolean | MediaTrackConstraints = true): Promise<Result> {
         return new Promise((resolve, reject) => {
-            let intervalHandler = setInterval(() => {
+            this.intervalHandler = setInterval(() => {
                 let result = this.scan(videoOptions);
                 if (result !== null) {
                     this.stopScanning(); // TODO make as callback
-                    clearInterval(intervalHandler);
                     resolve(result);
                 }
             }, frequency);
@@ -55,6 +56,10 @@ export class StreamScanner {
     }
 
     stopScanning() {
+        if (this.intervalHandler) {
+            clearInterval(this.intervalHandler);
+            this.intervalHandler = null;
+        }
         this.webcam.stop();
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
