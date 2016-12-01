@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "module": "es2015",
+    "target": "es5",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "outDir": "../lib",
+    "paths": {
+      "barquo": ["."],
+      "barquo/*": ["*"]
+    },
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "lib": [
+      "es6",
+      "es2015.promise",
+      "dom"
+    ]
+  },
+  "files": [
+    "index.ts"
+  ],
+  "exclude": ["node_modules", "lib", "demo", "tmp"]
+}

@@ -4,17 +4,11 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "baseUrl": ".",
-    "rootDirs": [
-      ".",
-      "../src"
-    ],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "paths": {
-      "barquo": [
-        "../lib"
-      ],
-      "barquo/*": [
-        "../lib/*"
-      ]
+      "barquo": ["../lib"],
+      "barquo/*": ["../lib/*"]
     },
     "types": [
       "jasmine"

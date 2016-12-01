@@ -1,8 +1,9 @@
+// var helpers = require('./config/helpers');
 // Karma configuration
 // Generated on Wed Oct 26 2016 18:07:51 GMT+0300 (MSK)
 
 module.exports = function (config) {
-    var testWebpackConfig = require('./test/webpack.test.js');
+    var testWebpackConfig = require('./config/webpack.test.js');
 
     config.set({
 
@@ -12,27 +13,36 @@ module.exports = function (config) {
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['jasmine', 'source-map-support'],
+        frameworks: [
+            'jasmine',
+            // 'source-map-support',
+        ],
 
 
         // list of files / patterns to load in the browser
         files: [
-            { pattern: 'test/test-context.js', watched: false },
-            // { pattern: 'lib/**/*.js', watched: false, served: true, included: false, nocache: true },
-            // { pattern: 'src/**/*.ts', watched: false, served: true, included: false, nocache: true },
+            { pattern: './test/test-context.js', watched: false },
+            // { pattern: './lib/**/*.js', watched: false, served: false, included: false },
+            // { pattern: './test/**/*.ts', watched: false, served: false, included: false },
+            // { pattern: './src/**/*.ts', watched: false, served: false, included: false },
+            // { pattern: 'test/**/*.ts' },
         ],
-
 
         // list of files to exclude
         exclude: [],
 
-
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            'test/test-context.js': ['coverage', 'webpack', 'sourcemap'],
+            // '**/*.ts': ['karma-typescript'],
+            './test/test-context.js': [
+                'coverage',
+                'webpack',
+                'sourcemap',
+                // 'sourcemap-writer', // important!
+            ],
             // 'lib/**/*.js': ['sourcemap'],
-            // 'src/**/*.ts': ['sourcemap'],
+            // 'src/**/*.ts': ['coverage', 'sourcemap'],
         },
 
 
@@ -40,9 +50,11 @@ module.exports = function (config) {
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         reporters: [
+            // 'dots',
             'mocha',
-            // 'coverage',
-            // 'remap-coverage'
+            'coverage',
+            'karma-remap-istanbul',
+            // 'karma-typescript',
         ],
 
 
@@ -56,12 +68,12 @@ module.exports = function (config) {
 
         // level of logging
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-        logLevel: config.LOG_ERROR,
+        logLevel: config.LOG_INFO,
 
 
         // enable / disable watching file and executing tests whenever any file changes
-        autoWatch: true,
-
+        autoWatch: false,
+        autoWatchBatchDelay: 1000,
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
@@ -69,7 +81,7 @@ module.exports = function (config) {
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
-        singleRun: false,
+        singleRun: true,
 
         // Concurrency level
         // how many browser should be started simultaneous
@@ -82,6 +94,9 @@ module.exports = function (config) {
             noInfo: true,
             quiet: true,
             publicPath: '',
+            watchOptions: {
+                aggregateTimeout: 1000,
+            },
         },
 
         mochaReporter: {
@@ -89,14 +104,28 @@ module.exports = function (config) {
             output: 'full',
         },
 
-        coverageReporter: {
-            type: 'in-memory',
+        // coverageReporter: {
+        //     type: 'in-memory',
+        //     // type: 'text-summary',
+        //
+        // },
+        coverageReporter: { // important!
+            instrumenterOptions: {
+                istanbul: { noCompact: true }
+            },
+            reporters: [
+                { type: 'in-memory' },
+                { type: 'json', dir: 'coverage', subdir: '.', file: 'coverage-intermediate.json' },
+            ],
         },
 
-        remapCoverageReporter: {
-            // 'text-summary': null,
-            json: './coverage/coverage.json',
-            html: './coverage/html'
+        remapIstanbulReporter: {
+            src: './coverage/coverage-intermediate.json',
+            reports: {
+                'text-summary': null,
+                html: './coverage',
+                json: './coverage/coverage.json',
+            },
         },
     })
 };

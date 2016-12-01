@@ -1,13 +1,16 @@
-import { StreamScanner, QrReader } from 'barquo';
+// import { StreamScanner, QrReader } from 'barquo';
 
 function main() {
     let canvas = document.querySelector('canvas');
-    let video = document.querySelector('video');
+    // let video = document.querySelector('video');
     let button = document.querySelector('button');
+    let img = document.querySelector('img');
 
-    let streamReader = new StreamScanner(canvas, video, new QrReader());
+    let context = canvas.getContext('2d');
 
-    button.onclick = () => streamReader.scanStream().then(result => console.log('RESULT', result));
+    context.drawImage(img, 0, 0, 2, 2);
+
+    button.onclick = () => console.log(context.getImageData(0, 0, 2, 2));
 
     // streamReader.scan().then(result => console.log('RESULT', result));
 }

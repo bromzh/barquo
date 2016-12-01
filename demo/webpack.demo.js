@@ -51,6 +51,14 @@ module.exports = {
                 test: /\.json$/,
                 loader: 'json-loader',
             },
+            {
+                test: /\.png$/,
+                loader: 'file',
+            },
+            {
+                test: /\.html$/,
+                loader: 'html',
+            },
         ]
     },
     plugins: [
