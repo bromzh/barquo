@@ -19,13 +19,14 @@ Add html
 
 Use scanner
 ```typescript
-import { StreamScanner, QrReader } from 'barquo';
+import { StreamScanner, QrReader, WebCam } from 'barquo';
 
 let canvas = document.querySelector('canvas');
 let video = document.querySelector('video');
 let button = document.querySelector('button');
+let webcam = new WebCam(video);
 
-let streamReader = new StreamScanner(canvas, video, new QrReader());
+let streamReader = new StreamScanner(canvas, webcam, new QrReader());
 
 button.onclick = () => streamReader.scanStream().then(result => console.log(result));
 ```
