@@ -13,7 +13,7 @@
     "watch": "tsc -w",
     "test": "karma start",
     "cpx": "cpx \"src/**/*.ts\" lib --watch",
-    "demo": "webpack-dev-server --hot --inline --config=demo/webpack.demo.js"
+    "demo": "webpack-dev-server --hot --inline --https --config=demo/webpack.demo.js"
   },
   "keywords": [
     "barcode",

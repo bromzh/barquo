@@ -1,15 +1,4 @@
-// import {findAlignment} from "./alignment_finder";
-// import {transformPoints, quadrilateralToQuadrilateral} from "./perspective_transform";
-// import {Version, getVersionForNumber} from "../common/version";
-// import {BitMatrix} from "../common/bitmatrix";
-// import {isNaN} from "../common/helpers";
-// import { Point, PerspectiveTransform, QRLocation } from '../models';
-// import { BitMatrix } from './bitmatrix';
-// import { transformPoints, quadrilateralToQuadrilateral } from './perspective-platform';
-// import { findAlignment } from './alignment-finder';
-// import { getVersionForNumber } from './version';
-
-import { BitMatrix } from '../..//core';
+import { BitMatrix } from '../../core';
 import { Point, QRLocation } from './qrlocation';
 import { PerspectiveTransform, transformPoints, quadrilateralToQuadrilateral } from './transform';
 import { findAlignment } from './alignment';
@@ -119,7 +108,7 @@ function createTransform(topLeft: Point, topRight: Point, bottomLeft: Point, ali
     let bottomRightY: number;
     let sourceBottomRightX: number;
     let sourceBottomRightY: number;
-    if (alignmentPattern != null) {
+    if (alignmentPattern !== null) {
         bottomRightX = alignmentPattern.x;
         bottomRightY = alignmentPattern.y;
         sourceBottomRightX = sourceBottomRightY = dimMinusThree - 3;
@@ -150,7 +139,6 @@ function createTransform(topLeft: Point, topRight: Point, bottomLeft: Point, ali
     );
 }
 
-// Taken from 6th grade algebra
 function distance(x1: number, y1: number, x2: number, y2: number) {
     return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }

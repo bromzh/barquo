@@ -8,20 +8,17 @@ export interface ScannerOptions {
 }
 
 export class StreamScanner {
-    webcam: WebCam;
+    // webcam: WebCam;
     ctx: CanvasRenderingContext2D;
 
     intervalHandler: number;
 
-    constructor(public canvas: HTMLCanvasElement, video: HTMLVideoElement, public reader: Reader,
+    constructor(public canvas: HTMLCanvasElement, public webcam: WebCam, public reader: Reader,
         { width, height }: ScannerOptions = { width: 640, height: 480 }) {
         this.ctx = this.canvas.getContext('2d');
 
         this.canvas.width = width;
         this.canvas.height = height;
-
-        // video = video || document.createElement('video');
-        this.webcam = new WebCam(video);
 
         this.reader = new QrReader();
     }

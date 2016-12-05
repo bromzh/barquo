@@ -6,11 +6,11 @@ export interface ScannerOptions {
 }
 export declare class StreamScanner {
     canvas: HTMLCanvasElement;
-    reader: Reader;
     webcam: WebCam;
+    reader: Reader;
     ctx: CanvasRenderingContext2D;
     intervalHandler: number;
-    constructor(canvas: HTMLCanvasElement, video: HTMLVideoElement, reader: Reader, {width, height}?: ScannerOptions);
+    constructor(canvas: HTMLCanvasElement, webcam: WebCam, reader: Reader, {width, height}?: ScannerOptions);
     takeShot(): ImageData;
     decode(img: ImageData): Result;
     scan(videoOptions?: boolean | MediaTrackConstraints): Result;

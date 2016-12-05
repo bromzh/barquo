@@ -72,6 +72,7 @@ module.exports = {
             aggregateTimeout: 300,
             poll: 1000
         },
-        outputPath: path.resolve(__dirname, '../tmp'),
+        host: '0.0.0.0',
+        // outputPath: path.resolve(__dirname, '../tmp'),
     },
 }

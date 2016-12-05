@@ -415,7 +415,6 @@ function decodeMatrix(matrix: BitMatrix): number[] {
             resultBytes[resultOffset++] = codewordBytes[i];
         }
     }
-
     return decodeQRdata(resultBytes, version.versionNumber, ecLevel.name);
 }
 

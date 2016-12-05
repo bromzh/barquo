@@ -13,14 +13,27 @@ function toAlphaNumericByte(value: number): number {
     return ALPHANUMERIC_CHARS[value].charCodeAt(0);
 }
 
-class Mode {
-    private characterCountBitsForVersions: number[];
-    private bits: number;
+enum QRMode {
+    TERMINATOR = 0x00,
+    NUMERIC = 0x01,
+    ALPHANUMERIC = 0x02,
+    STRUCTURED_APPEND = 0x03,
+    BYTE = 0x04,
+    FNC1_FIRST_POSITION = 0x05,
+    ECI = 0x07,
+    KANJI = 0x08,
+    FNC1_SECOND_POSITION = 0x09,
+    HANZI = 0x0D,
+}
 
-    constructor(characterCountBitsForVersions: number[], bits: number) {
-        this.characterCountBitsForVersions = characterCountBitsForVersions;
-        this.bits = bits;
+namespace QRMode {
+    export function getName(mode: QRMode): string {
+        return QRMode[mode];
     }
+}
+
+class QRModeInfo {
+    constructor(public characterCountBitsForVersions: number[]) { }
 
     getCharacterCountBits(version: number): number {
         if (this.characterCountBitsForVersions == null) {
@@ -38,44 +51,18 @@ class Mode {
     }
 }
 
-let TERMINATOR_MODE = new Mode([0, 0, 0], 0x00); // Not really a mod...
-let NUMERIC_MODE = new Mode([10, 12, 14], 0x01);
-let ALPHANUMERIC_MODE = new Mode([9, 11, 13], 0x02);
-let STRUCTURED_APPEND_MODE = new Mode([0, 0, 0], 0x03); // Not supported
-let BYTE_MODE = new Mode([8, 16, 16], 0x04);
-let ECI_MODE = new Mode(null, 0x07); // character counts don't apply
-let KANJI_MODE = new Mode([8, 10, 12], 0x08);
-let FNC1_FIRST_POSITION_MODE = new Mode(null, 0x05);
-let FNC1_SECOND_POSITION_MODE = new Mode(null, 0x09);
-let HANZI_MODE = new Mode([8, 10, 12], 0x0D);
-
-function modeForBits(bits: number): Mode {
-    switch (bits) {
-        case 0x0:
-            return TERMINATOR_MODE;
-        case 0x1:
-            return NUMERIC_MODE;
-        case 0x2:
-            return ALPHANUMERIC_MODE;
-        case 0x3:
-            return STRUCTURED_APPEND_MODE;
-        case 0x4:
-            return BYTE_MODE;
-        case 0x5:
-            return FNC1_FIRST_POSITION_MODE;
-        case 0x7:
-            return ECI_MODE;
-        case 0x8:
-            return KANJI_MODE;
-        case 0x9:
-            return FNC1_SECOND_POSITION_MODE;
-        case 0xD:
-            // 0xD is defined in GBT 18284-2000, may not be supported in foreign country
-            return HANZI_MODE;
-        default:
-            throw new Error("Couldn't decode mode from byte array");
-    }
-}
+const qrmodes: { [index: number]: QRModeInfo } = {
+    [QRMode.TERMINATOR]: new QRModeInfo([0, 0, 0]),
+    [QRMode.NUMERIC]: new QRModeInfo([10, 12, 14]),
+    [QRMode.ALPHANUMERIC]: new QRModeInfo([9, 11, 13]),
+    [QRMode.STRUCTURED_APPEND]: new QRModeInfo([0, 0, 0]),
+    [QRMode.BYTE]: new QRModeInfo([8, 16, 16]),
+    [QRMode.FNC1_FIRST_POSITION]: new QRModeInfo(null),
+    [QRMode.ECI]: new QRModeInfo(null),
+    [QRMode.KANJI]: new QRModeInfo([8, 10, 12]),
+    [QRMode.FNC1_SECOND_POSITION]: new QRModeInfo(null),
+    [QRMode.HANZI]: new QRModeInfo([8, 10, 12]),
+};
 
 function parseECIValue(bits: BitStream): number {
     let firstByte = bits.readBits(8);
@@ -126,7 +113,7 @@ function decodeHanziSegment(bits: BitStream, result: ResultByteArray, count: num
         offset += 2;
         count--;
     }
-    result.val = buffer;
+    result.val.push(...buffer);
     return true;
 }
 
@@ -221,7 +208,7 @@ function decodeByteSegment(bits: BitStream, result: ResultByteArray, count: numb
     for (let i = 0; i < count; i++) {
         readBytes[i] = bits.readBits(8);
     }
-    result.val = readBytes;
+    result.val.push(...readBytes);
     return true;
 }
 
@@ -234,23 +221,24 @@ export function decodeQRdata(data: number[], version: number, ecl: string): numb
     let parityData = -1;
 
     let bits = new BitStream(data);
-    let result = { val: <number[]>[] }; // Have to pass this around so functions can share a reference to a number[]
+    // Have to pass this around so functions can share a reference to a number[]
+    let result: ResultByteArray = { val: <number[]>[] };
     let fc1InEffect = false;
-    let mode: Mode;
+    let mode: QRMode;
 
-    while (mode !== TERMINATOR_MODE) {
+    while (mode !== QRMode.TERMINATOR) {
         // While still another segment to scan...
         if (bits.available() < 4) {
             // OK, assume we're done. Really, a TERMINATOR mode should have been recorded here
-            mode = TERMINATOR_MODE;
+            mode = QRMode.TERMINATOR;
         } else {
-            mode = modeForBits(bits.readBits(4)); // mode is encoded by 4 bits
+            mode = bits.readBits(4); // mode is encoded by 4 bits
         }
-        if (mode !== TERMINATOR_MODE) {
-            if (mode === FNC1_FIRST_POSITION_MODE || mode === FNC1_SECOND_POSITION_MODE) {
+        if (mode !== QRMode.TERMINATOR) {
+            if (mode === QRMode.FNC1_FIRST_POSITION || mode === QRMode.FNC1_SECOND_POSITION) {
                 // We do little with FNC1 except alter the parsed result a bit according to the spec
                 fc1InEffect = true;
-            } else if (mode === STRUCTURED_APPEND_MODE) {
+            } else if (mode === QRMode.STRUCTURED_APPEND) {
                 if (bits.available() < 16) {
                     return null;
                 }
@@ -258,7 +246,7 @@ export function decodeQRdata(data: number[], version: number, ecl: string): numb
                 // Read next 8 bits (symbol sequence #) and 8 bits (parity data), then continue
                 symbolSequence = bits.readBits(8);
                 parityData = bits.readBits(8);
-            } else if (mode === ECI_MODE) {
+            } else if (mode === QRMode.ECI) {
                 // Ignore since we don't do character encoding in JS
                 let value = parseECIValue(bits);
                 if (value < 0 || value > 30) {
@@ -266,10 +254,10 @@ export function decodeQRdata(data: number[], version: number, ecl: string): numb
                 }
             } else {
                 // First handle Hanzi mode which does not start with character count
-                if (mode === HANZI_MODE) {
+                if (mode === QRMode.HANZI) {
                     // chinese mode contains a sub set indicator right after mode indicator
                     let subset = bits.readBits(4);
-                    let countHanzi = bits.readBits(mode.getCharacterCountBits(version));
+                    let countHanzi = bits.readBits(qrmodes[mode].getCharacterCountBits(version));
                     if (subset === GB2312_SUBSET) {
                         if (!decodeHanziSegment(bits, result, countHanzi)) {
                             return null;
@@ -278,20 +266,20 @@ export function decodeQRdata(data: number[], version: number, ecl: string): numb
                 } else {
                     // "Normal" QR code modes:
                     // How many characters will follow, encoded in this mode?
-                    let count = bits.readBits(mode.getCharacterCountBits(version));
-                    if (mode === NUMERIC_MODE) {
+                    let count = bits.readBits(qrmodes[mode].getCharacterCountBits(version));
+                    if (mode === QRMode.NUMERIC) {
                         if (!decodeNumericSegment(bits, result, count)) {
                             return null;
                         }
-                    } else if (mode === ALPHANUMERIC_MODE) {
+                    } else if (mode === QRMode.ALPHANUMERIC) {
                         if (!decodeAlphanumericSegment(bits, result, count, fc1InEffect)) {
                             return null;
                         }
-                    } else if (mode === BYTE_MODE) {
+                    } else if (mode === QRMode.BYTE) {
                         if (!decodeByteSegment(bits, result, count)) {
                             return null;
                         }
-                    } else if (mode === KANJI_MODE) {
+                    } else if (mode === QRMode.KANJI) {
                         // if (!decodeKanjiSegment(bits, result, count)){
                         //   return null;
                         // }
